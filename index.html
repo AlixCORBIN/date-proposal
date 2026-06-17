@@ -15,23 +15,14 @@
       <div class="card-icon">✉️</div>
       <h1 class="card-title">Un message spécial</h1>
       <p class="card-sub">Entre ton prénom pour continuer&hellip;</p>
-
       <div class="input-wrap">
-        <input
-          type="text"
-          id="name-input"
-          class="name-input"
-          placeholder="Ton prénom"
-          autocomplete="off"
-          spellcheck="false"
-        />
+        <input type="text" id="name-input" class="name-input"
+               placeholder="Ton prénom" autocomplete="off" spellcheck="false" />
       </div>
-
       <p class="error-msg hidden" id="error-msg">
         Désolé, ce n'est pas toi que je cherche&hellip;&nbsp;🥺
       </p>
-
-      <button class="btn primary" id="btn-enter">C'est moi !&nbsp;✨</button>
+      <button class="btn primary full-width" id="btn-enter">C'est moi !&nbsp;✨</button>
     </div>
   </div>
 
@@ -39,11 +30,7 @@
   <div class="screen hidden" id="screen-proposal">
     <div class="card proposal-card">
       <img src="dog.jpg" alt="chien triste" class="dog-img" />
-
-      <h2 class="proposal-text">
-        Veux-tu faire un date avec moi&nbsp;?&nbsp;🐾
-      </h2>
-
+      <h2 class="proposal-text">Veux-tu faire un date avec moi&nbsp;?&nbsp;🐾</h2>
       <div class="btn-wrap">
         <button class="btn primary grow-yes" id="btn-yes">OUI&nbsp;!&nbsp;🐾</button>
         <button class="btn danger" id="btn-no" aria-label="Non">
@@ -54,7 +41,6 @@
           </svg>
         </button>
       </div>
-
       <p class="hint">
         <span class="desktop-hint">Le bouton Non te fuit…&nbsp;🐾</span>
         <span class="mobile-hint">Trop glissant ce bouton&nbsp;🧼</span>
@@ -78,23 +64,102 @@
       <div class="card-icon">🗓️</div>
       <h2 class="card-title">Quand es-tu libre&nbsp;?</h2>
       <p class="card-sub">Choisis une date et une heure&nbsp;✨</p>
-
       <div class="date-form" id="date-form">
         <div class="field">
           <label class="field-label">📅&nbsp; La date</label>
-          <input type="date" id="date-input" class="date-input" />
+          <input type="date" id="date-input" class="field-input" />
         </div>
         <div class="field">
           <label class="field-label">🕐&nbsp; L'heure</label>
-          <input type="time" id="time-input" class="date-input" />
+          <input type="time" id="time-input" class="field-input" />
         </div>
-        <button class="btn primary" id="btn-confirm">C'est noté&nbsp;!&nbsp;💕</button>
+        <button class="btn primary full-width" id="btn-confirm-date">C'est noté&nbsp;!&nbsp;💕</button>
+      </div>
+      <div class="step-confirm hidden" id="date-confirm">
+        <div class="confirm-icon">✅</div>
+        <p class="confirm-text" id="confirm-date-text"></p>
+        <button class="btn primary" id="btn-to-food" style="margin-top:20px">
+          Et pour manger&nbsp;?&nbsp;🍽️
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN 5 : NOURRITURE ===== -->
+  <div class="screen hidden" id="screen-food">
+    <div class="card">
+      <div class="card-icon">🍽️</div>
+      <h2 class="card-title">Et pour manger&nbsp;?</h2>
+      <p class="card-sub">Qu'est-ce qui te ferait plaisir&nbsp;?</p>
+
+      <div class="field">
+        <label class="field-label">🍴&nbsp; Quoi&nbsp;?</label>
+        <div class="chips" id="food-chips">
+          <button class="chip" data-target="food-what">Sushi 🍱</button>
+          <button class="chip" data-target="food-what">Pizza 🍕</button>
+          <button class="chip" data-target="food-what">Burger 🍔</button>
+          <button class="chip" data-target="food-what">Raclette 🧀</button>
+          <button class="chip" data-target="food-what">Crêpes 🥞</button>
+          <button class="chip" data-target="food-what">Coréen 🍜</button>
+          <button class="chip" data-target="food-what">Tacos 🌮</button>
+          <button class="chip" data-target="food-what">Barbecue 🍖</button>
+        </div>
+        <input type="text" id="food-what" class="field-input"
+               placeholder="Ou écris ta propre idée…" />
       </div>
 
-      <div class="date-confirm hidden" id="date-confirm">
-        <div class="confirm-icon">✅</div>
-        <p class="confirm-text" id="confirm-text"></p>
-        <p class="confirm-sub">Je serai là&nbsp;! 💕</p>
+      <div class="field">
+        <label class="field-label">📍&nbsp; Où&nbsp;?</label>
+        <input type="text" id="food-where" class="field-input"
+               placeholder="Un restaurant, chez toi, en livraison…" />
+      </div>
+
+      <button class="btn primary full-width" id="btn-confirm-food">
+        Trop bon&nbsp;!&nbsp;😋
+      </button>
+
+      <div class="step-confirm hidden" id="food-confirm">
+        <div class="confirm-icon">😋</div>
+        <p class="confirm-text" id="confirm-food-text"></p>
+        <button class="btn primary" id="btn-to-activity" style="margin-top:20px">
+          Et maintenant on fait quoi&nbsp;?&nbsp;🎉
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN 6 : ACTIVITÉ ===== -->
+  <div class="screen hidden" id="screen-activity">
+    <div class="card">
+      <div class="card-icon">🎉</div>
+      <h2 class="card-title">Qu'est-ce qu'on fait&nbsp;?</h2>
+      <p class="card-sub">Choisis ou invente l'activité parfaite&nbsp;✨</p>
+
+      <div class="field">
+        <div class="chips" id="activity-chips">
+          <button class="chip" data-target="activity-input">Karting 🏎️</button>
+          <button class="chip" data-target="activity-input">Cinéma 🎬</button>
+          <button class="chip" data-target="activity-input">Escape Game 🔐</button>
+          <button class="chip" data-target="activity-input">Bowling 🎳</button>
+          <button class="chip" data-target="activity-input">Concert 🎵</button>
+          <button class="chip" data-target="activity-input">Ballade 🌿</button>
+          <button class="chip" data-target="activity-input">Musée 🎨</button>
+          <button class="chip" data-target="activity-input">Laser Game 🔫</button>
+          <button class="chip" data-target="activity-input">Parc d'attractions 🎡</button>
+          <button class="chip" data-target="activity-input">Patin à glace ⛸️</button>
+        </div>
+        <input type="text" id="activity-input" class="field-input"
+               placeholder="Ou écris ta propre idée…" />
+      </div>
+
+      <button class="btn primary full-width" id="btn-confirm-activity">
+        C'est décidé&nbsp;!&nbsp;🎉
+      </button>
+
+      <div class="step-confirm hidden" id="activity-confirm">
+        <div class="confirm-icon">🎊</div>
+        <p class="confirm-text" id="confirm-activity-text"></p>
+        <p class="confirm-sub">Ce sera parfait&nbsp;! J'ai trop hâte&nbsp;💕</p>
       </div>
     </div>
   </div>

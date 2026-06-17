@@ -39,7 +39,7 @@
 
 
 /* ============================================================
-   HELPERS — transitions entre écrans
+   HELPER — transition entre écrans
    ============================================================ */
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => {
@@ -48,9 +48,48 @@ function showScreen(id) {
   });
   const target = document.getElementById(id);
   target.classList.remove('hidden');
-  // Force reflow pour que l'animation se rejoue
-  void target.offsetWidth;
+  void target.offsetWidth; // force reflow pour rejouer l'animation
   target.classList.add('active');
+}
+
+/* ============================================================
+   HELPER — chips cliquables
+   Quand on clique un chip : remplit l'input cible + marque selected
+   Quand on tape dans l'input : déselectionne tous les chips du groupe
+   ============================================================ */
+function initChips(groupId) {
+  const group = document.getElementById(groupId);
+  if (!group) return;
+
+  group.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const input = document.getElementById(chip.dataset.target);
+      if (!input) return;
+      // Déselectionne les autres chips du même groupe
+      group.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+      chip.classList.add('selected');
+      input.value = chip.textContent.trim();
+      input.focus();
+    });
+  });
+}
+
+function watchInputDeselectChips(inputId, groupId) {
+  const input = document.getElementById(inputId);
+  const group = document.getElementById(groupId);
+  if (!input || !group) return;
+  input.addEventListener('input', () => {
+    group.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+  });
+}
+
+/* ============================================================
+   HELPER — shake animation sur un élément
+   ============================================================ */
+function shake(el) {
+  el.style.animation = 'none';
+  void el.offsetWidth;
+  el.style.animation = 'shake 0.4s ease';
 }
 
 
@@ -61,14 +100,14 @@ const nameInput = document.getElementById('name-input');
 const errorMsg  = document.getElementById('error-msg');
 
 function submitName() {
-  const val = nameInput.value.trim().toLowerCase();
-  if (val === 'esther') {
+  if (nameInput.value.trim().toLowerCase() === 'esther') {
     showScreen('screen-proposal');
     startProposalScreen();
   } else {
     errorMsg.classList.remove('hidden');
     nameInput.value = '';
     nameInput.focus();
+    shake(nameInput);
   }
 }
 
@@ -84,11 +123,11 @@ function startProposalScreen() {
   initNoButton();
 }
 
-/* ---- OUI : croissance progressive ---- */
+/* OUI — croissance progressive (easeIn, 20 s, max ×1.8) */
 function growYesButton() {
   const btn      = document.getElementById('btn-yes');
   const start    = performance.now();
-  const DURATION = 20_000; // 20 secondes pour atteindre l'échelle max
+  const DURATION = 20_000;
   const MAX      = 1.8;
   let   stopped  = false;
 
@@ -97,15 +136,13 @@ function growYesButton() {
   (function frame(now) {
     if (stopped) return;
     const t     = Math.min((now - start) / DURATION, 1);
-    // Croissance easeIn : lente au début, plus rapide à la fin
-    const ease  = t * t;
-    const scale = 1 + (MAX - 1) * ease;
+    const scale = 1 + (MAX - 1) * (t * t); // easeIn
     btn.style.transform = `scale(${scale.toFixed(4)})`;
     if (t < 1) requestAnimationFrame(frame);
   })(start);
 }
 
-/* ---- OUI : clic ---- */
+/* OUI — clic → écran win + confettis */
 document.getElementById('btn-yes').addEventListener('click', () => {
   const btn = document.getElementById('btn-yes');
   if (btn._stopGrow) btn._stopGrow();
@@ -127,38 +164,88 @@ document.getElementById('btn-bebew').addEventListener('click', () => {
 /* ============================================================
    SCREEN 4 — DATE / HEURE
    ============================================================ */
-document.getElementById('btn-confirm').addEventListener('click', () => {
+document.getElementById('btn-confirm-date').addEventListener('click', () => {
   const dateVal = document.getElementById('date-input').value;
   const timeVal = document.getElementById('time-input').value;
 
   if (!dateVal && !timeVal) {
-    // Rien de saisi — petite secousse
-    const form = document.getElementById('date-form');
-    form.style.animation = 'none';
-    void form.offsetWidth;
-    form.style.animation = 'shake 0.4s ease';
+    shake(document.getElementById('date-form'));
     return;
   }
 
-  // Formater la date lisiblement
   let dateStr = '';
   if (dateVal) {
     const d = new Date(dateVal + 'T00:00:00');
-    dateStr = d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+    dateStr = d.toLocaleDateString('fr-FR', {
+      weekday: 'long', day: 'numeric', month: 'long'
+    });
   }
+  const timeStr = timeVal ? timeVal.replace(':', 'h') : '';
+  const parts   = [dateStr, timeStr].filter(Boolean);
 
-  let timeStr = '';
-  if (timeVal) {
-    const [h, m] = timeVal.split(':');
-    timeStr = `${h}h${m}`;
-  }
-
-  const parts = [dateStr, timeStr].filter(Boolean);
-  document.getElementById('confirm-text').textContent =
+  document.getElementById('confirm-date-text').textContent =
     `Rendez-vous ${parts.join(' à ')} ! 🗓️`;
 
   document.getElementById('date-form').classList.add('hidden');
   document.getElementById('date-confirm').classList.remove('hidden');
+});
+
+document.getElementById('btn-to-food').addEventListener('click', () => {
+  showScreen('screen-food');
+  initChips('food-chips');
+  watchInputDeselectChips('food-what', 'food-chips');
+});
+
+
+/* ============================================================
+   SCREEN 5 — NOURRITURE
+   ============================================================ */
+document.getElementById('btn-confirm-food').addEventListener('click', () => {
+  const what  = document.getElementById('food-what').value.trim();
+  const where = document.getElementById('food-where').value.trim();
+
+  if (!what && !where) {
+    shake(document.querySelector('#screen-food .card'));
+    return;
+  }
+
+  let msg = '';
+  if (what && where)   msg = `${what} chez ${where} 😋`;
+  else if (what)       msg = `${what} — super choix ! 😋`;
+  else                 msg = `Chez ${where} — j'adore ! 😋`;
+
+  document.getElementById('confirm-food-text').textContent = msg;
+  document.getElementById('btn-confirm-food').classList.add('hidden');
+  document.querySelector('#screen-food .field').classList.add('hidden');
+  document.querySelectorAll('#screen-food .field').forEach(f => f.classList.add('hidden'));
+  document.getElementById('food-confirm').classList.remove('hidden');
+});
+
+document.getElementById('btn-to-activity').addEventListener('click', () => {
+  showScreen('screen-activity');
+  initChips('activity-chips');
+  watchInputDeselectChips('activity-input', 'activity-chips');
+});
+
+
+/* ============================================================
+   SCREEN 6 — ACTIVITÉ
+   ============================================================ */
+document.getElementById('btn-confirm-activity').addEventListener('click', () => {
+  const val = document.getElementById('activity-input').value.trim();
+
+  if (!val) {
+    shake(document.getElementById('activity-input'));
+    return;
+  }
+
+  document.getElementById('confirm-activity-text').textContent =
+    `${val} — c'est parfait ! 🎊`;
+
+  document.getElementById('btn-confirm-activity').classList.add('hidden');
+  document.querySelector('#screen-activity .field').classList.add('hidden');
+  document.getElementById('activity-confirm').classList.remove('hidden');
+  launchConfetti();
 });
 
 
@@ -191,11 +278,10 @@ function initNoButton() {
   const btn      = document.getElementById('btn-no');
   const ringFill = document.getElementById('ring-fill');
   const CIRC     = 125.66;
-  let   isFixed  = false;
-  let   holdStart = null;
-  let   raf       = null;
+  let isFixed    = false;
+  let holdStart  = null;
+  let raf        = null;
 
-  /* ---- Utilitaires position ---- */
   function makeFixed() {
     if (isFixed) return;
     const r = btn.getBoundingClientRect();
@@ -209,9 +295,7 @@ function initNoButton() {
   }
 
   function moveTo(x, y) {
-    const w = btn.offsetWidth;
-    const h = btn.offsetHeight;
-    const p = 16;
+    const w = btn.offsetWidth, h = btn.offsetHeight, p = 16;
     x = Math.max(p, Math.min(window.innerWidth  - w - p, x));
     y = Math.max(p, Math.min(window.innerHeight - h - p, y));
     btn.style.left = x + 'px';
@@ -222,26 +306,24 @@ function initNoButton() {
     const r   = btn.getBoundingClientRect();
     const bx  = r.left + r.width  / 2;
     const by  = r.top  + r.height / 2;
-    const dx  = bx - cx;
-    const dy  = by - cy;
+    const dx  = bx - cx, dy = by - cy;
     const len = Math.hypot(dx, dy) || 1;
-    const fly = 110 + Math.random() * 90;
-    moveTo(r.left + (dx / len) * fly, r.top + (dy / len) * fly);
+    moveTo(r.left + (dx / len) * (110 + Math.random() * 90),
+           r.top  + (dy / len) * (110 + Math.random() * 90));
   }
 
-  /* ---- Anneau 3 s ---- */
-  function updateRing(progress) {
+  function updateRing(p) {
     ringFill.style.strokeDashoffset =
-      (CIRC * (1 - Math.max(0, Math.min(1, progress)))).toFixed(2);
+      (CIRC * (1 - Math.max(0, Math.min(1, p)))).toFixed(2);
   }
 
   function startHold() {
     holdStart = performance.now();
     if (raf) cancelAnimationFrame(raf);
     (function tick(now) {
-      const elapsed = (now - holdStart) / 1000;
-      updateRing(elapsed / 3);
-      if (elapsed >= 3) { updateRing(1); return; }
+      const e = (now - holdStart) / 1000;
+      updateRing(e / 3);
+      if (e >= 3) { updateRing(1); return; }
       raf = requestAnimationFrame(tick);
     })(holdStart);
   }
@@ -252,9 +334,7 @@ function initNoButton() {
     holdStart = null;
   }
 
-  /* ========================
-     PC — fuite à la souris
-     ======================== */
+  /* PC */
   btn.addEventListener('mouseenter', () => {
     makeFixed();
     pushFrom(
@@ -263,33 +343,25 @@ function initNoButton() {
     );
     cancelHold();
   });
-
   btn.addEventListener('mousedown',  e => { e.preventDefault(); startHold(); });
   btn.addEventListener('mouseup',    () => cancelHold());
   btn.addEventListener('mouseleave', () => cancelHold());
 
-  /* ========================
-     MOBILE — effet savon
-     ======================== */
+  /* Mobile savon */
   const SOAP_R = 130;
-
   document.addEventListener('touchmove', e => {
     if (!document.getElementById('screen-proposal').classList.contains('active')) return;
     makeFixed();
     const touch = e.touches[0];
     const r     = btn.getBoundingClientRect();
-    const bx    = r.left + r.width  / 2;
-    const by    = r.top  + r.height / 2;
-    const dx    = bx - touch.clientX;
-    const dy    = by - touch.clientY;
+    const dx    = (r.left + r.width  / 2) - touch.clientX;
+    const dy    = (r.top  + r.height / 2) - touch.clientY;
     const dist  = Math.hypot(dx, dy);
     if (dist < SOAP_R) {
       const force = (SOAP_R - dist) / SOAP_R;
       const len   = dist || 1;
-      moveTo(
-        r.left + (dx / len) * (60 + force * 100),
-        r.top  + (dy / len) * (60 + force * 100)
-      );
+      moveTo(r.left + (dx / len) * (60 + force * 100),
+             r.top  + (dy / len) * (60 + force * 100));
       cancelHold();
     }
   }, { passive: true });

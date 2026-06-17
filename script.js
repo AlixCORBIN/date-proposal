@@ -308,6 +308,19 @@ document.getElementById('btn-to-summary').addEventListener('click', () => {
   document.getElementById('sum-activity').textContent =
     dateData.activite || 'À définir';
 
+  /* Message de pickup : heure - 30 min */
+  const pickupEl = document.getElementById('pickup-msg');
+  if (dateData.heure) {
+    const [h, m] = dateData.heure.replace('h', ':').split(':').map(Number);
+    const total  = h * 60 + m - 30;
+    const ph     = String(Math.floor(((total % 1440) + 1440) % 1440 / 60)).padStart(2, '0');
+    const pm     = String(((total % 60) + 60) % 60).padStart(2, '0');
+    pickupEl.textContent = `🚗 Très bien, je passerai te chercher à ${ph}h${pm} !`;
+    pickupEl.classList.remove('hidden');
+  } else {
+    pickupEl.textContent = '';
+  }
+
   showScreen('screen-summary');
   launchConfetti();
 });

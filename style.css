@@ -386,6 +386,18 @@ body {
   line-height: 1.4;
 }
 
+.pickup-msg {
+  margin-top: 16px;
+  padding: 14px 18px;
+  background: rgba(232, 93, 154, 0.1);
+  border: 1px solid rgba(232, 93, 154, 0.25);
+  border-radius: 14px;
+  font-size: 0.95rem;
+  color: #f0c0d8;
+  line-height: 1.5;
+  animation: fade-up 0.5s 0.4s ease both;
+}
+
 /* ===== BUTTONS ===== */
 .btn {
   padding: 13px 30px;

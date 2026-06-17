@@ -5,8 +5,8 @@
    ============================================================ */
 (function () {
   const canvas = document.getElementById('stars');
-  const ctx = canvas.getContext('2d');
-  let stars = [];
+  const ctx    = canvas.getContext('2d');
+  let stars    = [];
 
   function init() {
     canvas.width  = window.innerWidth;
@@ -39,51 +39,133 @@
 
 
 /* ============================================================
+   HELPERS — transitions entre écrans
+   ============================================================ */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.add('hidden');
+    s.classList.remove('active');
+  });
+  const target = document.getElementById(id);
+  target.classList.remove('hidden');
+  // Force reflow pour que l'animation se rejoue
+  void target.offsetWidth;
+  target.classList.add('active');
+}
+
+
+/* ============================================================
    SCREEN 1 — NOM
    ============================================================ */
-const screenName     = document.getElementById('screen-name');
-const screenProposal = document.getElementById('screen-proposal');
-const nameInput      = document.getElementById('name-input');
-const errorMsg       = document.getElementById('error-msg');
-const btnEnter       = document.getElementById('btn-enter');
+const nameInput = document.getElementById('name-input');
+const errorMsg  = document.getElementById('error-msg');
 
 function submitName() {
   const val = nameInput.value.trim().toLowerCase();
   if (val === 'esther') {
-    errorMsg.classList.add('hidden');
-    screenName.classList.remove('active');
-    screenName.classList.add('hidden');
-    screenProposal.classList.remove('hidden');
-    screenProposal.classList.add('active');
-    initNoButton();
+    showScreen('screen-proposal');
+    startProposalScreen();
   } else {
     errorMsg.classList.remove('hidden');
     nameInput.value = '';
     nameInput.focus();
-    nameInput.classList.add('shake-input');
-    setTimeout(() => nameInput.classList.remove('shake-input'), 500);
   }
 }
 
-btnEnter.addEventListener('click', submitName);
-nameInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') submitName();
+document.getElementById('btn-enter').addEventListener('click', submitName);
+nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') submitName(); });
+
+
+/* ============================================================
+   SCREEN 2 — PROPOSITION
+   ============================================================ */
+function startProposalScreen() {
+  growYesButton();
+  initNoButton();
+}
+
+/* ---- OUI : croissance progressive ---- */
+function growYesButton() {
+  const btn      = document.getElementById('btn-yes');
+  const start    = performance.now();
+  const DURATION = 20_000; // 20 secondes pour atteindre l'échelle max
+  const MAX      = 1.8;
+  let   stopped  = false;
+
+  btn._stopGrow = () => { stopped = true; };
+
+  (function frame(now) {
+    if (stopped) return;
+    const t     = Math.min((now - start) / DURATION, 1);
+    // Croissance easeIn : lente au début, plus rapide à la fin
+    const ease  = t * t;
+    const scale = 1 + (MAX - 1) * ease;
+    btn.style.transform = `scale(${scale.toFixed(4)})`;
+    if (t < 1) requestAnimationFrame(frame);
+  })(start);
+}
+
+/* ---- OUI : clic ---- */
+document.getElementById('btn-yes').addEventListener('click', () => {
+  const btn = document.getElementById('btn-yes');
+  if (btn._stopGrow) btn._stopGrow();
+  showScreen('screen-win');
+  launchConfetti();
+  setTimeout(launchConfetti, 800);
+  setTimeout(launchConfetti, 1600);
 });
 
 
 /* ============================================================
-   SCREEN 2 — OUI
+   SCREEN 3 — WIN
    ============================================================ */
-const overlayWin = document.getElementById('overlay-win');
-const btnYes     = document.getElementById('btn-yes');
-const EMOJIS     = ['🐾', '❤️', '🎉', '✨', '🐾', '🌟', '🎊', '💕'];
-
-btnYes.addEventListener('click', () => {
-  overlayWin.classList.remove('hidden');
-  launchConfetti();
-  setTimeout(launchConfetti, 900);
-  setTimeout(launchConfetti, 1800);
+document.getElementById('btn-bebew').addEventListener('click', () => {
+  showScreen('screen-date');
 });
+
+
+/* ============================================================
+   SCREEN 4 — DATE / HEURE
+   ============================================================ */
+document.getElementById('btn-confirm').addEventListener('click', () => {
+  const dateVal = document.getElementById('date-input').value;
+  const timeVal = document.getElementById('time-input').value;
+
+  if (!dateVal && !timeVal) {
+    // Rien de saisi — petite secousse
+    const form = document.getElementById('date-form');
+    form.style.animation = 'none';
+    void form.offsetWidth;
+    form.style.animation = 'shake 0.4s ease';
+    return;
+  }
+
+  // Formater la date lisiblement
+  let dateStr = '';
+  if (dateVal) {
+    const d = new Date(dateVal + 'T00:00:00');
+    dateStr = d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+  }
+
+  let timeStr = '';
+  if (timeVal) {
+    const [h, m] = timeVal.split(':');
+    timeStr = `${h}h${m}`;
+  }
+
+  const parts = [dateStr, timeStr].filter(Boolean);
+  document.getElementById('confirm-text').textContent =
+    `Rendez-vous ${parts.join(' à ')} ! 🗓️`;
+
+  document.getElementById('date-form').classList.add('hidden');
+  document.getElementById('date-confirm').classList.remove('hidden');
+});
+
+
+/* ============================================================
+   CONFETTI
+   ============================================================ */
+const EMOJIS = ['🐾', '❤️', '🎉', '✨', '💕', '🌟', '🎊', '💖'];
 
 function launchConfetti() {
   let n = 0;
@@ -92,10 +174,10 @@ function launchConfetti() {
     const el = document.createElement('span');
     el.className = 'confetti';
     el.textContent = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
-    el.style.left             = Math.random() * 100 + 'vw';
-    el.style.fontSize         = (1.4 + Math.random() * 2) + 'rem';
+    el.style.left              = Math.random() * 100 + 'vw';
+    el.style.fontSize          = (1.4 + Math.random() * 2) + 'rem';
     el.style.animationDuration = (1.8 + Math.random() * 2.5) + 's';
-    el.style.animationDelay   = Math.random() * 0.4 + 's';
+    el.style.animationDelay    = Math.random() * 0.4 + 's';
     document.body.appendChild(el);
     el.addEventListener('animationend', () => el.remove());
   }, 65);
@@ -103,135 +185,120 @@ function launchConfetti() {
 
 
 /* ============================================================
-   SCREEN 2 — NON BUTTON  (fuite + savon + maintien 3 s)
+   NON BUTTON — fuite PC + savon mobile + maintien 3 s
    ============================================================ */
 function initNoButton() {
   const btn      = document.getElementById('btn-no');
   const ringFill = document.getElementById('ring-fill');
-  const CIRCUMFERENCE = 125.66; // 2π × r=20
+  const CIRC     = 125.66;
   let   isFixed  = false;
-  let   holdTimer = null;
   let   holdStart = null;
   let   raf       = null;
 
-  /* ---- Position utilities ---- */
-  function getRect() { return btn.getBoundingClientRect(); }
-
+  /* ---- Utilitaires position ---- */
   function makeFixed() {
     if (isFixed) return;
-    const r = getRect();
-    btn.style.position  = 'fixed';
-    btn.style.left      = r.left + 'px';
-    btn.style.top       = r.top  + 'px';
-    btn.style.margin    = '0';
-    btn.style.zIndex    = '50';
-    btn.style.transition = 'left 0.06s ease-out, top 0.06s ease-out';
+    const r = btn.getBoundingClientRect();
+    btn.style.position   = 'fixed';
+    btn.style.left       = r.left + 'px';
+    btn.style.top        = r.top  + 'px';
+    btn.style.margin     = '0';
+    btn.style.zIndex     = '50';
+    btn.style.transition = 'left 0.07s ease-out, top 0.07s ease-out';
     isFixed = true;
   }
 
   function moveTo(x, y) {
     const w = btn.offsetWidth;
     const h = btn.offsetHeight;
-    const pad = 16;
-    x = Math.max(pad, Math.min(window.innerWidth  - w - pad, x));
-    y = Math.max(pad, Math.min(window.innerHeight - h - pad, y));
+    const p = 16;
+    x = Math.max(p, Math.min(window.innerWidth  - w - p, x));
+    y = Math.max(p, Math.min(window.innerHeight - h - p, y));
     btn.style.left = x + 'px';
     btn.style.top  = y + 'px';
   }
 
-  function pushAway(cx, cy) {
-    const r   = getRect();
+  function pushFrom(cx, cy) {
+    const r   = btn.getBoundingClientRect();
     const bx  = r.left + r.width  / 2;
     const by  = r.top  + r.height / 2;
     const dx  = bx - cx;
     const dy  = by - cy;
     const len = Math.hypot(dx, dy) || 1;
-    const fly = 120 + Math.random() * 80;
+    const fly = 110 + Math.random() * 90;
     moveTo(r.left + (dx / len) * fly, r.top + (dy / len) * fly);
   }
 
-  /* ---- 3-second hold ring ---- */
+  /* ---- Anneau 3 s ---- */
   function updateRing(progress) {
     ringFill.style.strokeDashoffset =
-      (CIRCUMFERENCE * (1 - Math.max(0, Math.min(1, progress)))).toFixed(2);
+      (CIRC * (1 - Math.max(0, Math.min(1, progress)))).toFixed(2);
   }
 
   function startHold() {
     holdStart = performance.now();
-    cancelHold();
-    function tick(now) {
-      const elapsed  = (now - holdStart) / 1000;
-      const progress = elapsed / 3;
-      updateRing(progress);
-      if (elapsed >= 3) {
-        updateRing(1);
-        cancelHold(true); // truly validated → easter egg
-        return;
-      }
+    if (raf) cancelAnimationFrame(raf);
+    (function tick(now) {
+      const elapsed = (now - holdStart) / 1000;
+      updateRing(elapsed / 3);
+      if (elapsed >= 3) { updateRing(1); return; }
       raf = requestAnimationFrame(tick);
-    }
-    raf = requestAnimationFrame(tick);
+    })(holdStart);
   }
 
-  function cancelHold(completed) {
+  function cancelHold() {
     if (raf) { cancelAnimationFrame(raf); raf = null; }
-    if (!completed) updateRing(0);
+    updateRing(0);
     holdStart = null;
   }
 
-  /* ==================================================
-     PC — fuite à la souris (mouseenter)
-     ================================================== */
+  /* ========================
+     PC — fuite à la souris
+     ======================== */
   btn.addEventListener('mouseenter', () => {
     makeFixed();
-    const r = getRect();
-    pushAway(r.left + r.width / 2, r.top + r.height / 2);
+    pushFrom(
+      btn.getBoundingClientRect().left + btn.offsetWidth  / 2,
+      btn.getBoundingClientRect().top  + btn.offsetHeight / 2
+    );
     cancelHold();
   });
 
-  btn.addEventListener('mousedown', (e) => {
-    e.preventDefault();
-    startHold();
-  });
-
+  btn.addEventListener('mousedown',  e => { e.preventDefault(); startHold(); });
   btn.addEventListener('mouseup',    () => cancelHold());
   btn.addEventListener('mouseleave', () => cancelHold());
 
+  /* ========================
+     MOBILE — effet savon
+     ======================== */
+  const SOAP_R = 130;
 
-  /* ==================================================
-     MOBILE — effet savon (touchmove global)
-     ================================================== */
-  const SOAP_RADIUS = 130;
-
-  document.addEventListener('touchmove', (e) => {
-    if (!isFixed && !document.getElementById('screen-proposal').classList.contains('active')) return;
+  document.addEventListener('touchmove', e => {
+    if (!document.getElementById('screen-proposal').classList.contains('active')) return;
     makeFixed();
-
     const touch = e.touches[0];
-    const r     = getRect();
+    const r     = btn.getBoundingClientRect();
     const bx    = r.left + r.width  / 2;
     const by    = r.top  + r.height / 2;
     const dx    = bx - touch.clientX;
     const dy    = by - touch.clientY;
     const dist  = Math.hypot(dx, dy);
-
-    if (dist < SOAP_RADIUS) {
-      const force = (SOAP_RADIUS - dist) / SOAP_RADIUS;
+    if (dist < SOAP_R) {
+      const force = (SOAP_R - dist) / SOAP_R;
       const len   = dist || 1;
-      const slide = 60 + force * 100;
       moveTo(
-        r.left + (dx / len) * slide,
-        r.top  + (dy / len) * slide
+        r.left + (dx / len) * (60 + force * 100),
+        r.top  + (dy / len) * (60 + force * 100)
       );
-      cancelHold(); // mouvement = annule le maintien
+      cancelHold();
     }
   }, { passive: true });
 
-  btn.addEventListener('touchstart', (e) => {
+  btn.addEventListener('touchstart', e => {
     e.preventDefault();
     makeFixed();
-    const touch = e.touches[0];
-    pushAway(touch.clientX, touch.clientY);
+    const t = e.touches[0];
+    pushFrom(t.clientX, t.clientY);
     startHold();
   }, { passive: false });
 

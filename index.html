@@ -45,7 +45,7 @@
       </h2>
 
       <div class="btn-wrap">
-        <button class="btn primary" id="btn-yes">OUI&nbsp;!&nbsp;🐾</button>
+        <button class="btn primary grow-yes" id="btn-yes">OUI&nbsp;!&nbsp;🐾</button>
         <button class="btn danger" id="btn-no" aria-label="Non">
           <span class="no-label">Non&hellip;</span>
           <svg class="no-ring" viewBox="0 0 44 44" aria-hidden="true">
@@ -62,12 +62,40 @@
     </div>
   </div>
 
-  <!-- ===== WIN OVERLAY ===== -->
-  <div class="overlay hidden" id="overlay-win">
-    <div class="win-content">
-      <div class="win-emoji">🎉</div>
-      <h2 class="win-title">YAAAAY&nbsp;!!</h2>
-      <p class="win-sub">On va tellement bien s'amuser&nbsp;🐾❤️</p>
+  <!-- ===== SCREEN 3 : ELLE A DIT OUI ===== -->
+  <div class="screen hidden" id="screen-win">
+    <div class="card win-card">
+      <div class="win-icon">🎉</div>
+      <h2 class="win-title">ELLE A DIT OUI&nbsp;!!</h2>
+      <p class="win-sub">Je suis le plus heureux 🐾💕</p>
+      <button class="btn primary" id="btn-bebew">ok bebeewww&nbsp;!!&nbsp;💕</button>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN 4 : DATE / HEURE ===== -->
+  <div class="screen hidden" id="screen-date">
+    <div class="card date-card">
+      <div class="card-icon">🗓️</div>
+      <h2 class="card-title">Quand es-tu libre&nbsp;?</h2>
+      <p class="card-sub">Choisis une date et une heure&nbsp;✨</p>
+
+      <div class="date-form" id="date-form">
+        <div class="field">
+          <label class="field-label">📅&nbsp; La date</label>
+          <input type="date" id="date-input" class="date-input" />
+        </div>
+        <div class="field">
+          <label class="field-label">🕐&nbsp; L'heure</label>
+          <input type="time" id="time-input" class="date-input" />
+        </div>
+        <button class="btn primary" id="btn-confirm">C'est noté&nbsp;!&nbsp;💕</button>
+      </div>
+
+      <div class="date-confirm hidden" id="date-confirm">
+        <div class="confirm-icon">✅</div>
+        <p class="confirm-text" id="confirm-text"></p>
+        <p class="confirm-sub">Je serai là&nbsp;! 💕</p>
+      </div>
     </div>
   </div>
 

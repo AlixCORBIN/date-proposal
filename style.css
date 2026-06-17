@@ -35,20 +35,18 @@ body {
   z-index: 1;
 }
 
-.screen.hidden {
-  display: none;
-}
+.screen.hidden { display: none; }
 
 .screen.active {
   animation: screen-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 @keyframes screen-in {
-  from { opacity: 0; transform: scale(0.9) translateY(16px); }
-  to   { opacity: 1; transform: scale(1)   translateY(0);    }
+  from { opacity: 0; transform: scale(0.92) translateY(14px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0);    }
 }
 
-/* ===== CARD ===== */
+/* ===== BASE CARD ===== */
 .card {
   background: rgba(255, 255, 255, 0.04);
   backdrop-filter: blur(14px);
@@ -61,10 +59,10 @@ body {
   text-align: center;
   box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
-/* ===== SCREEN 1 — NOM ===== */
+/* ===== SHARED ELEMENTS ===== */
 .card-icon {
   font-size: 2.8rem;
   margin-bottom: 12px;
@@ -87,13 +85,12 @@ body {
 
 .card-sub {
   font-size: 0.95rem;
-  color: rgba(240, 240, 255, 0.6);
+  color: rgba(240, 240, 255, 0.55);
   margin-bottom: 28px;
 }
 
-.input-wrap {
-  margin-bottom: 12px;
-}
+/* ===== SCREEN 1 — NOM ===== */
+.input-wrap { margin-bottom: 12px; }
 
 .name-input {
   width: 100%;
@@ -132,10 +129,13 @@ body {
   75%       { transform: translateX(8px);  }
 }
 
-/* ===== SCREEN 2 — PROPOSITION ===== */
-.proposal-card {
-  padding: 32px 28px;
+#screen-name .btn.primary {
+  width: 100%;
+  margin-top: 8px;
 }
+
+/* ===== SCREEN 2 — PROPOSITION ===== */
+.proposal-card { padding: 32px 28px; }
 
 .dog-img {
   width: 200px;
@@ -144,10 +144,8 @@ body {
   border-radius: 50%;
   border: 3px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
-  margin-bottom: 22px;
+  margin: 0 auto 22px;
   display: block;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .proposal-text {
@@ -164,22 +162,143 @@ body {
   gap: 14px;
   flex-wrap: wrap;
   margin-bottom: 16px;
-  position: relative;
 }
 
 .hint {
-  font-size: 0.8rem;
-  color: rgba(240, 240, 255, 0.35);
+  font-size: 0.78rem;
+  color: rgba(240, 240, 255, 0.32);
   margin-top: 4px;
 }
 
-/* Show/hide hint based on device */
 .desktop-hint { display: inline; }
 .mobile-hint  { display: none;   }
 
 @media (hover: none) and (pointer: coarse) {
   .desktop-hint { display: none;   }
   .mobile-hint  { display: inline; }
+}
+
+/* ===== SCREEN 3 — WIN ===== */
+.win-card {
+  padding: 48px 36px;
+}
+
+.win-icon {
+  font-size: 4rem;
+  margin-bottom: 16px;
+  animation: bounce-icon 0.7s ease-in-out infinite alternate;
+}
+
+@keyframes bounce-icon {
+  from { transform: translateY(0) scale(1);      }
+  to   { transform: translateY(-12px) scale(1.1); }
+}
+
+.win-title {
+  font-size: clamp(2rem, 9vw, 3.2rem);
+  font-weight: 900;
+  letter-spacing: 3px;
+  background: linear-gradient(135deg, #ffd86e, #ff9060, #e85d9a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 10px;
+  animation: title-in 0.7s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+@keyframes title-in {
+  from { transform: scale(0.5) rotate(-6deg); opacity: 0; }
+  to   { transform: scale(1)   rotate(0deg);  opacity: 1; }
+}
+
+.win-sub {
+  font-size: 1.05rem;
+  color: rgba(240,240,255,0.7);
+  margin-bottom: 28px;
+  animation: fade-up 0.5s 0.2s ease both;
+}
+
+@keyframes fade-up {
+  from { transform: translateY(12px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.win-card .btn.primary {
+  animation: fade-up 0.5s 0.35s ease both;
+}
+
+/* ===== SCREEN 4 — DATE ===== */
+.date-card { padding: 36px 32px; }
+
+.date-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field {
+  text-align: left;
+}
+
+.field-label {
+  display: block;
+  font-size: 0.88rem;
+  color: rgba(240,240,255,0.55);
+  margin-bottom: 7px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.date-input {
+  width: 100%;
+  padding: 13px 18px;
+  font-size: 1rem;
+  font-family: inherit;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1.5px solid rgba(255, 255, 255, 0.13);
+  border-radius: 14px;
+  color: #fff;
+  outline: none;
+  color-scheme: dark;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.date-input:focus {
+  border-color: rgba(232, 121, 160, 0.6);
+  box-shadow: 0 0 0 3px rgba(232, 121, 160, 0.12);
+}
+
+/* Confirmation */
+.date-confirm {
+  text-align: center;
+}
+
+.date-confirm.hidden { display: none; }
+
+.confirm-icon {
+  font-size: 3rem;
+  margin-bottom: 14px;
+  animation: pop-in 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+.confirm-text {
+  font-size: 1.1rem;
+  color: #fff;
+  font-weight: 600;
+  margin-bottom: 8px;
+  animation: fade-up 0.5s 0.1s ease both;
+}
+
+.confirm-sub {
+  font-size: 0.95rem;
+  color: rgba(240,240,255,0.6);
+  animation: fade-up 0.5s 0.2s ease both;
+}
+
+@keyframes pop-in {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
 }
 
 /* ===== BUTTONS ===== */
@@ -191,28 +310,32 @@ body {
   border: none;
   border-radius: 50px;
   cursor: pointer;
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
   position: relative;
   -webkit-tap-highlight-color: transparent;
 }
 
-/* OUI button */
+/* OUI / primary */
 .btn.primary {
   background: linear-gradient(135deg, #ff9060, #e85d9a);
   color: #fff;
   box-shadow: 0 4px 20px rgba(232, 93, 154, 0.45);
-  animation: pulse-yes 2s ease-in-out infinite;
 }
 
-.btn.primary:hover  { transform: scale(1.06); box-shadow: 0 6px 28px rgba(232,93,154,0.7); }
-.btn.primary:active { transform: scale(0.96); }
+.btn.primary:active { filter: brightness(0.9); }
 
-@keyframes pulse-yes {
-  0%, 100% { box-shadow: 0 4px 20px rgba(232,93,154,0.4); }
-  50%       { box-shadow: 0 4px 34px rgba(232,93,154,0.85); }
+/* The OUI grow button — scale is driven by JS, glow animation separate */
+.grow-yes {
+  animation: glow-yes 2s ease-in-out infinite;
+  transform-origin: center;
+  transition: box-shadow 0.15s ease;
 }
 
-/* NON button */
+@keyframes glow-yes {
+  0%, 100% { box-shadow: 0 4px 20px rgba(232,93,154,0.4);  }
+  50%       { box-shadow: 0 4px 36px rgba(232,93,154,0.85); }
+}
+
+/* NON / danger */
 .btn.danger {
   background: #1e1e3a;
   color: rgba(255, 255, 255, 0.55);
@@ -223,23 +346,18 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
   overflow: visible;
 }
 
-.no-label {
-  position: relative;
-  z-index: 1;
-}
+.no-label { position: relative; z-index: 1; }
 
-/* SVG ring for 3s hold progress */
+/* SVG ring for 3 s hold */
 .no-ring {
   position: absolute;
   inset: -6px;
   width: calc(100% + 12px);
   height: calc(100% + 12px);
   pointer-events: none;
-  border-radius: 50px;
   overflow: visible;
 }
 
@@ -264,49 +382,6 @@ body {
   vector-effect: non-scaling-stroke;
 }
 
-/* ===== WIN OVERLAY ===== */
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(7, 7, 43, 0.94);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-  text-align: center;
-}
-
-.overlay.hidden { display: none; }
-
-.win-content {
-  animation: win-in 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-}
-
-@keyframes win-in {
-  from { transform: scale(0.6); opacity: 0; }
-  to   { transform: scale(1);   opacity: 1; }
-}
-
-.win-emoji {
-  font-size: 5rem;
-  display: block;
-  margin-bottom: 12px;
-}
-
-.win-title {
-  font-size: clamp(2.8rem, 10vw, 5.5rem);
-  font-weight: 900;
-  color: #fff;
-  letter-spacing: 4px;
-  text-shadow: 0 0 40px rgba(255,150,100,0.7);
-}
-
-.win-sub {
-  margin-top: 14px;
-  font-size: 1.2rem;
-  color: rgba(255,255,255,0.85);
-}
-
 /* ===== CONFETTI ===== */
 .confetti {
   position: fixed;
@@ -321,10 +396,4 @@ body {
   0%   { transform: translateY(0)     rotate(0deg)   scale(1);   opacity: 1; }
   85%  { opacity: 1; }
   100% { transform: translateY(110vh) rotate(720deg) scale(0.4); opacity: 0; }
-}
-
-/* ===== SCREEN-1 submit button (réutilise .btn.primary mais margin) ===== */
-#screen-name .btn.primary {
-  width: 100%;
-  margin-top: 8px;
 }

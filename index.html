@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Un message pour toi 🐾</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="stars"></canvas>
+
+  <!-- ===== SCREEN 1 : NOM ===== -->
+  <div class="screen active" id="screen-name">
+    <div class="card">
+      <div class="card-icon">✉️</div>
+      <h1 class="card-title">Un message spécial</h1>
+      <p class="card-sub">Entre ton prénom pour continuer&hellip;</p>
+
+      <div class="input-wrap">
+        <input
+          type="text"
+          id="name-input"
+          class="name-input"
+          placeholder="Ton prénom"
+          autocomplete="off"
+          spellcheck="false"
+        />
+      </div>
+
+      <p class="error-msg hidden" id="error-msg">
+        Désolé, ce n'est pas toi que je cherche&hellip;&nbsp;🥺
+      </p>
+
+      <button class="btn primary" id="btn-enter">C'est moi !&nbsp;✨</button>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN 2 : PROPOSITION ===== -->
+  <div class="screen hidden" id="screen-proposal">
+    <div class="card proposal-card">
+      <img src="dog.jpg" alt="chien triste" class="dog-img" />
+
+      <h2 class="proposal-text">
+        Veux-tu faire un date avec moi&nbsp;?&nbsp;🐾
+      </h2>
+
+      <div class="btn-wrap">
+        <button class="btn primary" id="btn-yes">OUI&nbsp;!&nbsp;🐾</button>
+        <button class="btn danger" id="btn-no" aria-label="Non">
+          <span class="no-label">Non&hellip;</span>
+          <svg class="no-ring" viewBox="0 0 44 44" aria-hidden="true">
+            <circle class="ring-track" cx="22" cy="22" r="20"/>
+            <circle class="ring-fill"  cx="22" cy="22" r="20" id="ring-fill"/>
+          </svg>
+        </button>
+      </div>
+
+      <p class="hint">
+        <span class="desktop-hint">Le bouton Non te fuit…&nbsp;🐾</span>
+        <span class="mobile-hint">Trop glissant ce bouton&nbsp;🧼</span>
+      </p>
+    </div>
+  </div>
+
+  <!-- ===== WIN OVERLAY ===== -->
+  <div class="overlay hidden" id="overlay-win">
+    <div class="win-content">
+      <div class="win-emoji">🎉</div>
+      <h2 class="win-title">YAAAAY&nbsp;!!</h2>
+      <p class="win-sub">On va tellement bien s'amuser&nbsp;🐾❤️</p>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

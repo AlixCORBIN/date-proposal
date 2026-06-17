@@ -1,6 +1,26 @@
 'use strict';
 
 /* ============================================================
+   EMAILJS CONFIG
+   → Remplis ces 3 valeurs après avoir créé ton compte sur emailjs.com
+   ============================================================ */
+const EMAILJS_PUBLIC_KEY  = 'VOTRE_PUBLIC_KEY';   // Account → General → Public Key
+const EMAILJS_SERVICE_ID  = 'VOTRE_SERVICE_ID';   // Email Services → Service ID
+const EMAILJS_TEMPLATE_ID = 'VOTRE_TEMPLATE_ID';  // Email Templates → Template ID
+
+emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+
+/* Données collectées au fil des écrans */
+const dateData = {
+  date:     '',
+  heure:    '',
+  quoi:     '',
+  ou:       '',
+  activite: ''
+};
+
+
+/* ============================================================
    STARS
    ============================================================ */
 (function () {
@@ -48,24 +68,20 @@ function showScreen(id) {
   });
   const target = document.getElementById(id);
   target.classList.remove('hidden');
-  void target.offsetWidth; // force reflow pour rejouer l'animation
+  void target.offsetWidth;
   target.classList.add('active');
 }
 
 /* ============================================================
    HELPER — chips cliquables
-   Quand on clique un chip : remplit l'input cible + marque selected
-   Quand on tape dans l'input : déselectionne tous les chips du groupe
    ============================================================ */
 function initChips(groupId) {
   const group = document.getElementById(groupId);
   if (!group) return;
-
   group.querySelectorAll('.chip').forEach(chip => {
     chip.addEventListener('click', () => {
       const input = document.getElementById(chip.dataset.target);
       if (!input) return;
-      // Déselectionne les autres chips du même groupe
       group.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
       chip.classList.add('selected');
       input.value = chip.textContent.trim();
@@ -84,7 +100,7 @@ function watchInputDeselectChips(inputId, groupId) {
 }
 
 /* ============================================================
-   HELPER — shake animation sur un élément
+   HELPER — shake
    ============================================================ */
 function shake(el) {
   el.style.animation = 'none';
@@ -123,7 +139,6 @@ function startProposalScreen() {
   initNoButton();
 }
 
-/* OUI — croissance progressive (easeIn, 20 s, max ×1.8) */
 function growYesButton() {
   const btn      = document.getElementById('btn-yes');
   const start    = performance.now();
@@ -136,13 +151,12 @@ function growYesButton() {
   (function frame(now) {
     if (stopped) return;
     const t     = Math.min((now - start) / DURATION, 1);
-    const scale = 1 + (MAX - 1) * (t * t); // easeIn
+    const scale = 1 + (MAX - 1) * (t * t);
     btn.style.transform = `scale(${scale.toFixed(4)})`;
     if (t < 1) requestAnimationFrame(frame);
   })(start);
 }
 
-/* OUI — clic → écran win + confettis */
 document.getElementById('btn-yes').addEventListener('click', () => {
   const btn = document.getElementById('btn-yes');
   if (btn._stopGrow) btn._stopGrow();
@@ -179,10 +193,12 @@ document.getElementById('btn-confirm-date').addEventListener('click', () => {
     dateStr = d.toLocaleDateString('fr-FR', {
       weekday: 'long', day: 'numeric', month: 'long'
     });
+    dateData.date = dateStr;
   }
   const timeStr = timeVal ? timeVal.replace(':', 'h') : '';
-  const parts   = [dateStr, timeStr].filter(Boolean);
+  if (timeStr) dateData.heure = timeStr;
 
+  const parts = [dateStr, timeStr].filter(Boolean);
   document.getElementById('confirm-date-text').textContent =
     `Rendez-vous ${parts.join(' à ')} ! 🗓️`;
 
@@ -209,6 +225,9 @@ document.getElementById('btn-confirm-food').addEventListener('click', () => {
     return;
   }
 
+  dateData.quoi = what  || '(non précisé)';
+  dateData.ou   = where || '(non précisé)';
+
   let msg = '';
   if (what && where)   msg = `${what} chez ${where} 😋`;
   else if (what)       msg = `${what} — super choix ! 😋`;
@@ -216,7 +235,6 @@ document.getElementById('btn-confirm-food').addEventListener('click', () => {
 
   document.getElementById('confirm-food-text').textContent = msg;
   document.getElementById('btn-confirm-food').classList.add('hidden');
-  document.querySelector('#screen-food .field').classList.add('hidden');
   document.querySelectorAll('#screen-food .field').forEach(f => f.classList.add('hidden'));
   document.getElementById('food-confirm').classList.remove('hidden');
 });
@@ -229,7 +247,7 @@ document.getElementById('btn-to-activity').addEventListener('click', () => {
 
 
 /* ============================================================
-   SCREEN 6 — ACTIVITÉ
+   SCREEN 6 — ACTIVITÉ + ENVOI EMAIL
    ============================================================ */
 document.getElementById('btn-confirm-activity').addEventListener('click', () => {
   const val = document.getElementById('activity-input').value.trim();
@@ -239,13 +257,25 @@ document.getElementById('btn-confirm-activity').addEventListener('click', () => 
     return;
   }
 
+  dateData.activite = val;
+
   document.getElementById('confirm-activity-text').textContent =
     `${val} — c'est parfait ! 🎊`;
 
   document.getElementById('btn-confirm-activity').classList.add('hidden');
   document.querySelector('#screen-activity .field').classList.add('hidden');
   document.getElementById('activity-confirm').classList.remove('hidden');
+
   launchConfetti();
+
+  /* Envoi email */
+  emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+    date:     dateData.date     || 'non précisée',
+    heure:    dateData.heure    || 'non précisée',
+    quoi:     dateData.quoi     || 'non précisé',
+    ou:       dateData.ou       || 'non précisé',
+    activite: dateData.activite
+  }).catch(() => {/* silencieux si clés pas encore configurées */});
 });
 
 
@@ -334,7 +364,6 @@ function initNoButton() {
     holdStart = null;
   }
 
-  /* PC */
   btn.addEventListener('mouseenter', () => {
     makeFixed();
     pushFrom(
@@ -347,7 +376,6 @@ function initNoButton() {
   btn.addEventListener('mouseup',    () => cancelHold());
   btn.addEventListener('mouseleave', () => cancelHold());
 
-  /* Mobile savon */
   const SOAP_R = 130;
   document.addEventListener('touchmove', e => {
     if (!document.getElementById('screen-proposal').classList.contains('active')) return;

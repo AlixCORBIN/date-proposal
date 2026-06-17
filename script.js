@@ -4,9 +4,9 @@
    EMAILJS CONFIG
    → Remplis ces 3 valeurs après avoir créé ton compte sur emailjs.com
    ============================================================ */
-const EMAILJS_PUBLIC_KEY  = 'VOTRE_PUBLIC_KEY';   // Account → General → Public Key
-const EMAILJS_SERVICE_ID  = 'VOTRE_SERVICE_ID';   // Email Services → Service ID
-const EMAILJS_TEMPLATE_ID = 'VOTRE_TEMPLATE_ID';  // Email Templates → Template ID
+const EMAILJS_PUBLIC_KEY  = 'TcnNcaEuoq4VPumA2';
+const EMAILJS_SERVICE_ID  = 'service_8bq24ej';
+const EMAILJS_TEMPLATE_ID = 'template_vq4s2ng';
 
 emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
 

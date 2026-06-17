@@ -2,13 +2,52 @@
 
 /* ============================================================
    EMAILJS CONFIG
-   → Remplis ces 3 valeurs après avoir créé ton compte sur emailjs.com
    ============================================================ */
 const EMAILJS_PUBLIC_KEY  = 'TcnNcaEuoq4VPumA2';
 const EMAILJS_SERVICE_ID  = 'service_8bq24ej';
 const EMAILJS_TEMPLATE_ID = 'template_vq4s2ng';
 
 emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+
+/* ============================================================
+   PROFILS — ajoute autant de noms que tu veux ici
+   Clé = prénom en minuscules, sans accent
+   ============================================================ */
+const PROFILS = {
+  esther: {
+    prenom:      'Esther',
+    proposition: 'Veux-tu faire un date avec moi ? 🐾',
+    winSub:      'Je suis le plus heureux 🐾💕',
+    winTitle:    'ELLE A DIT OUI !!',
+    btnBebew:    'ok bebeewww !! 💕',
+  },
+  pierre: {
+    prenom:      'Pierre',
+    proposition: 'Veux-tu faire un date avec moi ? 🐾',
+    winSub:      'Je suis le plus heureux 🐾💕',
+    winTitle:    'IL A DIT OUI !!',
+    btnBebew:    'ok bebeewww !! 💕',
+  },
+  /* --- Ajoute d'autres noms ici --- */
+  // marie: {
+  //   prenom:      'Marie',
+  //   proposition: 'Veux-tu faire un date avec moi ? 🌸',
+  //   winSub:      'Trop contente 💕',
+  //   winTitle:    'ELLE A DIT OUI !!',
+  //   btnBebew:    'ok bebeewww !! 💕',
+  // },
+};
+
+/* Profil utilisé si le nom n'est pas dans PROFILS */
+const PROFIL_DEFAULT = {
+  prenom:      '',
+  proposition: 'Veux-tu faire un date avec moi ? 🐾',
+  winSub:      'Super ! 💕',
+  winTitle:    'OUI !!',
+  btnBebew:    'Super !! 💕',
+};
+
+let profil = PROFIL_DEFAULT;
 
 /* Données collectées au fil des écrans */
 const dateData = {
@@ -116,16 +155,21 @@ const nameInput = document.getElementById('name-input');
 const errorMsg  = document.getElementById('error-msg');
 
 function submitName() {
-  const val = nameInput.value.trim().toLowerCase();
-  if (val === 'esther' || val === 'pierre') {
-    showScreen('screen-proposal');
-    startProposalScreen();
-  } else {
-    errorMsg.classList.remove('hidden');
-    nameInput.value = '';
-    nameInput.focus();
+  const raw = nameInput.value.trim();
+  if (!raw) {
     shake(nameInput);
+    return;
   }
+
+  const key = raw.toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, ''); // retire les accents pour la clé
+  profil = PROFILS[key] || { ...PROFIL_DEFAULT, prenom: raw };
+
+  /* Personnalise le texte de la proposition */
+  document.querySelector('.proposal-text').textContent = profil.proposition;
+
+  showScreen('screen-proposal');
+  startProposalScreen();
 }
 
 document.getElementById('btn-enter').addEventListener('click', submitName);
@@ -161,6 +205,12 @@ function growYesButton() {
 document.getElementById('btn-yes').addEventListener('click', () => {
   const btn = document.getElementById('btn-yes');
   if (btn._stopGrow) btn._stopGrow();
+
+  /* Applique le texte du profil */
+  document.querySelector('.win-title').textContent = profil.winTitle;
+  document.querySelector('.win-sub').textContent   = profil.winSub;
+  document.getElementById('btn-bebew').textContent = profil.btnBebew;
+
   showScreen('screen-win');
   launchConfetti();
   setTimeout(launchConfetti, 800);
@@ -285,6 +335,7 @@ document.getElementById('btn-confirm-activity').addEventListener('click', () => 
 
   /* Envoi email */
   emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+    prenom:   profil.prenom     || 'Inconnu(e)',
     date:     dateData.date     || 'non précisée',
     heure:    dateData.heure    || 'non précisée',
     quoi:     dateData.quoi     || 'non précisé',

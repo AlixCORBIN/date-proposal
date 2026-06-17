@@ -111,8 +111,11 @@
 
       <div class="field">
         <label class="field-label">📍&nbsp; Où&nbsp;?</label>
-        <input type="text" id="food-where" class="field-input"
-               placeholder="Un restaurant, chez toi, en livraison…" />
+        <div class="choice-wrap" id="food-where-choices">
+          <button class="choice-btn" data-value="Restaurant">🍽️&nbsp; Restaurant</button>
+          <button class="choice-btn" data-value="Fast food">🍟&nbsp; Fast food</button>
+          <button class="choice-btn" data-value="Chez moi">🏠&nbsp; Chez moi</button>
+        </div>
       </div>
 
       <button class="btn primary full-width" id="btn-confirm-food">
@@ -160,8 +163,36 @@
       <div class="step-confirm hidden" id="activity-confirm">
         <div class="confirm-icon">🎊</div>
         <p class="confirm-text" id="confirm-activity-text"></p>
-        <p class="confirm-sub">Ce sera parfait&nbsp;! J'ai trop hâte&nbsp;💕</p>
+        <button class="btn primary" id="btn-to-summary" style="margin-top:20px">
+          Voir le récap&nbsp;!&nbsp;✨
+        </button>
       </div>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN 7 : RÉCAP FINAL ===== -->
+  <div class="screen hidden" id="screen-summary">
+    <div class="card">
+      <div class="card-icon">💕</div>
+      <h2 class="card-title">Notre date&nbsp;!</h2>
+      <p class="card-sub">Voilà ce qui nous attend&nbsp;✨</p>
+
+      <div class="summary">
+        <div class="summary-item">
+          <span class="summary-emoji">📅</span>
+          <span class="summary-text" id="sum-date"></span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-emoji">🍽️</span>
+          <span class="summary-text" id="sum-food"></span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-emoji">🎉</span>
+          <span class="summary-text" id="sum-activity"></span>
+        </div>
+      </div>
+
+      <p class="confirm-sub">J'ai trop hâte&nbsp;! 💕</p>
     </div>
   </div>
 

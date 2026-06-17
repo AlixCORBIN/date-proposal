@@ -306,6 +306,75 @@ body {
   animation: fade-up 0.5s 0.2s ease both;
 }
 
+/* ===== CHOICE BUTTONS (où manger) ===== */
+.choice-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.choice-btn {
+  width: 100%;
+  padding: 14px 18px;
+  background: rgba(255,255,255,0.05);
+  border: 1.5px solid rgba(255,255,255,0.1);
+  border-radius: 14px;
+  color: rgba(240,240,255,0.72);
+  font-size: 1rem;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.18s, border-color 0.18s, color 0.18s, transform 0.12s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.choice-btn:hover {
+  background: rgba(232,93,154,0.1);
+  border-color: rgba(232,93,154,0.35);
+  color: #f0d0e8;
+}
+
+.choice-btn.selected {
+  background: rgba(232,93,154,0.18);
+  border-color: rgba(232,93,154,0.6);
+  color: #e879a0;
+  transform: scale(1.02);
+}
+
+/* ===== SUMMARY (récap final) ===== */
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 20px 0;
+  text-align: left;
+}
+
+.summary-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 14px 16px;
+  animation: fade-up 0.4s ease both;
+}
+
+.summary-item:nth-child(1) { animation-delay: 0.05s; }
+.summary-item:nth-child(2) { animation-delay: 0.15s; }
+.summary-item:nth-child(3) { animation-delay: 0.25s; }
+
+.summary-emoji { font-size: 1.5rem; flex-shrink: 0; }
+
+.summary-text {
+  font-size: 0.97rem;
+  color: #fff;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
 /* ===== BUTTONS ===== */
 .btn {
   padding: 13px 30px;

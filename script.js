@@ -210,28 +210,41 @@ document.getElementById('btn-to-food').addEventListener('click', () => {
   showScreen('screen-food');
   initChips('food-chips');
   watchInputDeselectChips('food-what', 'food-chips');
+  initChoiceButtons();
 });
 
 
 /* ============================================================
    SCREEN 5 — NOURRITURE
    ============================================================ */
+
+/* Boutons choix "où manger" */
+function initChoiceButtons() {
+  document.querySelectorAll('#food-where-choices .choice-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#food-where-choices .choice-btn')
+        .forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      dateData.ou = btn.dataset.value;
+    });
+  });
+}
+
 document.getElementById('btn-confirm-food').addEventListener('click', () => {
   const what  = document.getElementById('food-what').value.trim();
-  const where = document.getElementById('food-where').value.trim();
+  const where = dateData.ou;
 
   if (!what && !where) {
     shake(document.querySelector('#screen-food .card'));
     return;
   }
 
-  dateData.quoi = what  || '(non précisé)';
-  dateData.ou   = where || '(non précisé)';
+  dateData.quoi = what || '(non précisé)';
 
   let msg = '';
-  if (what && where)   msg = `${what} chez ${where} 😋`;
+  if (what && where)   msg = `${what} — ${where} 😋`;
   else if (what)       msg = `${what} — super choix ! 😋`;
-  else                 msg = `Chez ${where} — j'adore ! 😋`;
+  else                 msg = `${where} — j'adore ! 😋`;
 
   document.getElementById('confirm-food-text').textContent = msg;
   document.getElementById('btn-confirm-food').classList.add('hidden');
@@ -267,6 +280,7 @@ document.getElementById('btn-confirm-activity').addEventListener('click', () => 
   document.getElementById('activity-confirm').classList.remove('hidden');
 
   launchConfetti();
+  setTimeout(launchConfetti, 700);
 
   /* Envoi email */
   emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
@@ -276,6 +290,26 @@ document.getElementById('btn-confirm-activity').addEventListener('click', () => 
     ou:       dateData.ou       || 'non précisé',
     activite: dateData.activite
   }).catch(() => {/* silencieux si clés pas encore configurées */});
+});
+
+
+/* ============================================================
+   SCREEN 7 — RÉCAP FINAL
+   ============================================================ */
+document.getElementById('btn-to-summary').addEventListener('click', () => {
+  const dateParts = [dateData.date, dateData.heure].filter(Boolean);
+  document.getElementById('sum-date').textContent =
+    dateParts.length ? dateParts.join(' à ') : 'À définir';
+
+  const foodParts = [dateData.quoi, dateData.ou].filter(p => p && p !== '(non précisé)');
+  document.getElementById('sum-food').textContent =
+    foodParts.length ? foodParts.join(' — ') : 'À définir';
+
+  document.getElementById('sum-activity').textContent =
+    dateData.activite || 'À définir';
+
+  showScreen('screen-summary');
+  launchConfetti();
 });
 
 

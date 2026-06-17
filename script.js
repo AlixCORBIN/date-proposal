@@ -339,102 +339,14 @@ function launchConfetti() {
    NON BUTTON — fuite PC + savon mobile + maintien 3 s
    ============================================================ */
 function initNoButton() {
-  const btn      = document.getElementById('btn-no');
-  const ringFill = document.getElementById('ring-fill');
-  const CIRC     = 125.66;
-  let isFixed    = false;
-  let holdStart  = null;
-  let raf        = null;
+  const btn   = document.getElementById('btn-no');
+  const error = document.getElementById('no-error');
 
-  function makeFixed() {
-    if (isFixed) return;
-    const r = btn.getBoundingClientRect();
-    btn.style.position   = 'fixed';
-    btn.style.left       = r.left + 'px';
-    btn.style.top        = r.top  + 'px';
-    btn.style.margin     = '0';
-    btn.style.zIndex     = '50';
-    btn.style.transition = 'left 0.07s ease-out, top 0.07s ease-out';
-    isFixed = true;
-  }
-
-  function moveTo(x, y) {
-    const w = btn.offsetWidth, h = btn.offsetHeight, p = 16;
-    x = Math.max(p, Math.min(window.innerWidth  - w - p, x));
-    y = Math.max(p, Math.min(window.innerHeight - h - p, y));
-    btn.style.left = x + 'px';
-    btn.style.top  = y + 'px';
-  }
-
-  function pushFrom(cx, cy) {
-    const r   = btn.getBoundingClientRect();
-    const bx  = r.left + r.width  / 2;
-    const by  = r.top  + r.height / 2;
-    const dx  = bx - cx, dy = by - cy;
-    const len = Math.hypot(dx, dy) || 1;
-    moveTo(r.left + (dx / len) * (110 + Math.random() * 90),
-           r.top  + (dy / len) * (110 + Math.random() * 90));
-  }
-
-  function updateRing(p) {
-    ringFill.style.strokeDashoffset =
-      (CIRC * (1 - Math.max(0, Math.min(1, p)))).toFixed(2);
-  }
-
-  function startHold() {
-    holdStart = performance.now();
-    if (raf) cancelAnimationFrame(raf);
-    (function tick(now) {
-      const e = (now - holdStart) / 1000;
-      updateRing(e / 3);
-      if (e >= 3) { updateRing(1); return; }
-      raf = requestAnimationFrame(tick);
-    })(holdStart);
-  }
-
-  function cancelHold() {
-    if (raf) { cancelAnimationFrame(raf); raf = null; }
-    updateRing(0);
-    holdStart = null;
-  }
-
-  btn.addEventListener('mouseenter', () => {
-    makeFixed();
-    pushFrom(
-      btn.getBoundingClientRect().left + btn.offsetWidth  / 2,
-      btn.getBoundingClientRect().top  + btn.offsetHeight / 2
-    );
-    cancelHold();
+  btn.addEventListener('click', () => {
+    error.classList.remove('hidden');
+    // Relancer l'animation shake à chaque clic
+    error.style.animation = 'none';
+    void error.offsetWidth;
+    error.style.animation = 'shake 0.45s ease';
   });
-  btn.addEventListener('mousedown',  e => { e.preventDefault(); startHold(); });
-  btn.addEventListener('mouseup',    () => cancelHold());
-  btn.addEventListener('mouseleave', () => cancelHold());
-
-  const SOAP_R = 130;
-  document.addEventListener('touchmove', e => {
-    if (!document.getElementById('screen-proposal').classList.contains('active')) return;
-    makeFixed();
-    const touch = e.touches[0];
-    const r     = btn.getBoundingClientRect();
-    const dx    = (r.left + r.width  / 2) - touch.clientX;
-    const dy    = (r.top  + r.height / 2) - touch.clientY;
-    const dist  = Math.hypot(dx, dy);
-    if (dist < SOAP_R) {
-      const force = (SOAP_R - dist) / SOAP_R;
-      const len   = dist || 1;
-      moveTo(r.left + (dx / len) * (60 + force * 100),
-             r.top  + (dy / len) * (60 + force * 100));
-      cancelHold();
-    }
-  }, { passive: true });
-
-  btn.addEventListener('touchstart', e => {
-    e.preventDefault();
-    makeFixed();
-    const t = e.touches[0];
-    pushFrom(t.clientX, t.clientY);
-    startHold();
-  }, { passive: false });
-
-  btn.addEventListener('touchend', () => cancelHold());
 }

@@ -116,7 +116,8 @@ const nameInput = document.getElementById('name-input');
 const errorMsg  = document.getElementById('error-msg');
 
 function submitName() {
-  if (nameInput.value.trim().toLowerCase() === 'esther') {
+  const val = nameInput.value.trim().toLowerCase();
+  if (val === 'esther' || val === 'pierre') {
     showScreen('screen-proposal');
     startProposalScreen();
   } else {

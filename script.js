@@ -233,25 +233,21 @@ document.getElementById('btn-confirm-date').addEventListener('click', () => {
   const dateVal = document.getElementById('date-input').value;
   const timeVal = document.getElementById('time-input').value;
 
-  if (!dateVal && !timeVal) {
-    shake(document.getElementById('date-form'));
-    return;
-  }
+  let ok = true;
+  if (!dateVal) { shake(document.getElementById('date-input')); ok = false; }
+  if (!timeVal) { shake(document.getElementById('time-input')); ok = false; }
+  if (!ok) return;
 
-  let dateStr = '';
-  if (dateVal) {
-    const d = new Date(dateVal + 'T00:00:00');
-    dateStr = d.toLocaleDateString('fr-FR', {
-      weekday: 'long', day: 'numeric', month: 'long'
-    });
-    dateData.date = dateStr;
-  }
-  const timeStr = timeVal ? timeVal.replace(':', 'h') : '';
-  if (timeStr) dateData.heure = timeStr;
+  const d = new Date(dateVal + 'T00:00:00');
+  const dateStr = d.toLocaleDateString('fr-FR', {
+    weekday: 'long', day: 'numeric', month: 'long'
+  });
+  dateData.date  = dateStr;
+  const timeStr  = timeVal.replace(':', 'h');
+  dateData.heure = timeStr;
 
-  const parts = [dateStr, timeStr].filter(Boolean);
   document.getElementById('confirm-date-text').textContent =
-    `Rendez-vous ${parts.join(' à ')} ! 🗓️`;
+    `Rendez-vous ${dateStr} à ${timeStr} ! 🗓️`;
 
   document.getElementById('date-form').classList.add('hidden');
   document.getElementById('date-confirm').classList.remove('hidden');
@@ -285,19 +281,15 @@ document.getElementById('btn-confirm-food').addEventListener('click', () => {
   const what  = document.getElementById('food-what').value.trim();
   const where = dateData.ou;
 
-  if (!what && !where) {
-    shake(document.querySelector('#screen-food .card'));
-    return;
-  }
+  let ok = true;
+  if (!what)  { shake(document.getElementById('food-what'));          ok = false; }
+  if (!where) { shake(document.getElementById('food-where-choices')); ok = false; }
+  if (!ok) return;
 
-  dateData.quoi = what || '(non précisé)';
+  dateData.quoi = what;
 
-  let msg = '';
-  if (what && where)   msg = `${what} — ${where} 😋`;
-  else if (what)       msg = `${what} — super choix ! 😋`;
-  else                 msg = `${where} — j'adore ! 😋`;
-
-  document.getElementById('confirm-food-text').textContent = msg;
+  document.getElementById('confirm-food-text').textContent =
+    `${what} — ${where} 😋`;
   document.getElementById('btn-confirm-food').classList.add('hidden');
   document.querySelectorAll('#screen-food .field').forEach(f => f.classList.add('hidden'));
   document.getElementById('food-confirm').classList.remove('hidden');
